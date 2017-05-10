@@ -15,10 +15,6 @@ library(ggfortify)
 ## Import Data
 MorphData<-read.csv("MuhaidatEtAl_RawData.csv",header=T)
 str(MorphData)
-## Recode integer as numeric
-MorphData$BVeins<-as.numeric(MorphData$BVeins)
-MorphData$BSpines<-as.numeric(MorphData$BSpines)
-MorphData$LTeeth<-as.numeric(MorphData$LTeeth)
 
 ## Add midvalue for missing data
 for(Row in 1:nrow(MorphData)){
@@ -28,6 +24,14 @@ for(Row in 1:nrow(MorphData)){
     }
   }
 }
+
+## Recode integer as numeric
+MorphData$BVeins<-as.numeric(MorphData$BVeins)
+MorphData$BSpines<-as.numeric(MorphData$BSpines)
+MorphData$LTeeth<-as.numeric(MorphData$LTeeth)
+
+## Inspect pairwise scatterplots
+pairs(MorphData,col=rgb(0,0,0,0.3),pch=16)
 
 ## Principal Components Analysis
 PC<-prcomp(MorphData[,2:ncol(MorphData)],scale=T,center=T)
@@ -66,3 +70,5 @@ anova(lm(PC8 ~ Loc,data=MorphPCs))
 anova(lm(PC9 ~ Loc,data=MorphPCs))
 anova(lm(PC10 ~ Loc,data=MorphPCs))
 
+## Software version info
+sessionInfo()
