@@ -13,7 +13,7 @@ library(ggplot2)
 library(ggfortify)
 
 ## Import Data
-MorphData<-read.csv("MuhaidatEtAl_RawData.csv",header=T)
+MorphData<-read.csv("MuhaidatEtAl_MorphData.csv",header=T)
 str(MorphData)
 
 ## Add midvalue for missing data
@@ -32,9 +32,15 @@ MorphData$LTeeth<-as.numeric(MorphData$LTeeth)
 
 ## Inspect pairwise scatterplots
 pairs(MorphData,col=rgb(0,0,0,0.3),pch=16)
+test<-melt(MorphData[,3:16])
+qplot(value,facets=variable,data=test)
+
+pdf("LDAplot.pdf",width=6,height=6)
+melt()
+dev.off()
 
 ## Principal Components Analysis
-PC<-prcomp(MorphData[,2:ncol(MorphData)],scale=T,center=T)
+PC<-prcomp(MorphData[,grep("ID|Loc",names(MorphData),invert=T)],scale=T,center=T)
 ### Summary
 summary(PC)
 ### ScreePlot
@@ -47,7 +53,12 @@ screeplot(PC)
 n<-10
 100*sum(summary(PC)[[1]][1:n])/sum(summary(PC)[[1]])
 ### Factor Loadings
-PC$Rotation
+PC$rotation
+
+### Export Morphological data with PCs
+FullData<-cbind(MorphData,PC$x)
+str(PCAdata)
+write.csv(FullData,"PCAdata.csv",row.names=F)
 
 ### Plot of PC1 & 2
 #### Individuals
@@ -72,3 +83,4 @@ anova(lm(PC10 ~ Loc,data=MorphPCs))
 
 ## Software version info
 sessionInfo()
+

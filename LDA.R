@@ -29,7 +29,7 @@ library(ggfortify)
 library(MASS)
 
 ## Import Data
-MorphData<-read.csv("MuhaidatEtAl_RawData.csv",header=T)
+MorphData<-read.csv("MuhaidatEtAl_MorphData.csv",header=T)
 str(MorphData)
 
 ## Add midvalue for missing data
@@ -42,13 +42,13 @@ for(Row in 1:nrow(MorphData)){
 }
 
 ## Inspect pairwise scatterplots
-pairs(MorphData,col=rgb(0,0,0,0.3),pch=16)
+pairs(MorphData[,3:ncol(MorphData)],col=rgb(0,0,0,0.3),pch=16)
 
 ## Scale data to mean and sd prior to analysis
 scale<-function(x){
   return((x-mean(x,na.rm=T))/sd(x,na.rm=T))
 }
-MorphScaled<-data.frame(sapply(MorphData[,2:ncol(MorphData)],scale))
+MorphScaled<-data.frame(sapply(MorphData[,3:ncol(MorphData)],scale))
 MorphScaled$Loc<-as.factor(MorphData$Loc)
 
 # Linear discriminant function analysis
@@ -68,7 +68,7 @@ p<-ggplot(data=BlephLDAval,aes(x=LD1,y=LD2,group=Loc))+
   stat_ellipse(geom="polygon",aes(colour=Loc),fill=NA,size=1.2,alpha=0.3)+
   stat_ellipse(geom="polygon",aes(fill=Loc,colour=Loc),size=1.2,alpha=0.3)+
   geom_point(aes(shape=Loc,fill=Loc,colour=Loc),size=I(4),alpha=I(0.8))+
-  xlab("LD Axis 1")+ylab("LD Axis 2")+theme_simple() 
+  xlab("LDA1")+ylab("LDA2")+theme_simple() 
   
 print(p)
 
@@ -76,13 +76,30 @@ pdf("LDAplot.pdf",width=6,height=6)
   print(p)
 dev.off()
 
-## Output table to csv
+## Create Table of LDA scales + significance from lm model
+### LDA scales
 BlephLDAscales<-data.frame(round(BlephLDA$scaling,3))
 BlephLDAscales$desc<-c("Bract Length","Bract Width","Veins per bract","Lateral spines","Longest spine length","Internode length",
                        "Leaf length","Leaf width","Teeth per leaf","Filament length","Anther length","Appendage length",
                        "Filament length","Anther length")
+### Significance testing
+BlephLDAscales$F<-NA
+BlephLDAscales$P<-NA
+names(MorphScaled)
+for(col in 1:(ncol(MorphScaled)-1)){
+  BlephLDAscales$F[grep(names(MorphScaled)[col],row.names(BlephLDAscales))]<-anova(lm(MorphScaled[,col]~MorphScaled$Loc))$F[1]
+  BlephLDAscales$P[grep(names(MorphScaled)[col],row.names(BlephLDAscales))]<-anova(lm(MorphScaled[,col]~MorphScaled$Loc))$P[1]
+}
+BlephLDAscales$F<-round(BlephLDAscales$F,2)
+BlephLDAscales$P<-round(BlephLDAscales$P,3)
 
+### Output table to csv
 write.csv(BlephLDAscales,"LDAscales.csv",row.names=T)
+
+## Output data with LDA scores
+FullData<-cbind(MorphData,BlephLDAval[,c("LD1","LD2")])
+str(FullData)
+write.csv(FullData,"LDAData.csv",row.names=F)
 
 ## Test significance of LD Axes
 anova(lm(BlephLDAval$LD1~MorphScaled$Loc))
@@ -91,7 +108,7 @@ anova(lm(BlephLDAval$LD2~MorphScaled$Loc))
 ## Plot trait vectors
 BlephLDAscales$Loc<-NA
 s<-2 # scale for vector
-k<-0.5# Keep this proportion of largest vectors
+k<-0.4 # Keep this proportion of largest vectors
 
 keep<-abs(sqrt(BlephLDAscales$LD1^2+BlephLDAscales$LD2^2))>=sort(abs(c(sqrt(BlephLDAscales$LD1^2+BlephLDAscales$LD2^2))),decreasing=T)[floor(nrow(BlephLDAscales)*k)] 
 p+geom_segment(data=BlephLDAscales[keep,],aes(x=0,xend=LD1*s,y=0,yend=LD2*s),
@@ -100,3 +117,4 @@ p+geom_segment(data=BlephLDAscales[keep,],aes(x=0,xend=LD1*s,y=0,yend=LD2*s),
 
 ## Software version info
 sessionInfo()
+
