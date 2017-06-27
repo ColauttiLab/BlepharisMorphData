@@ -58,8 +58,20 @@ p2<-ggplot(data=Coords,aes(x=LD1,y=LD2)) +
   xlab("LD Axis1")+ylab("LD Axis2")+theme_simple() 
 print(p2)
 
-pdf("NMDSvsLDAplot.pdf",width=6,height=6)
+pdf("LDAplot.pdf",width=6,height=6)
   print(p2)
+dev.off()
+
+## Plot NMDS vs LDA
+p3<-ggplot(data=Coords,aes(x=NMDS1,y=LD1)) +
+  stat_ellipse(geom="polygon",aes(colour=Loc),fill=NA,size=1.2,alpha=0.3)+
+  stat_ellipse(geom="polygon",aes(fill=Loc,colour=Loc),size=1.2,alpha=0.3)+
+  geom_point(aes(colour=Loc),alpha=0.5,size=I(4)) +  
+  xlab("NMDS Axis1")+ylab("LD Axis1")+theme_simple() 
+print(p3)
+
+pdf("NMDSvsLDAplot.pdf",width=6,height=6)
+  print(p3)
 dev.off()
 
 
