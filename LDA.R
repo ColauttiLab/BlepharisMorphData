@@ -16,7 +16,7 @@ theme_simple <- function (base_size = 12, base_family = "") {
       panel.border = element_blank(),
       plot.title=element_text(face="bold", size=24),
       legend.position="none"
-    )   
+    ) 
 }
 
 
@@ -71,6 +71,9 @@ p<-ggplot(data=BlephLDAval,aes(x=LD1,y=LD2,group=Loc))+
   xlab("LDA1")+ylab("LDA2")+theme_simple() 
   
 print(p)
+
+## Quickplot to see legend
+qplot(LD1,LD2,data=BlephLDAval)
 
 pdf("LDAplot.pdf",width=6,height=6)
   print(p)
