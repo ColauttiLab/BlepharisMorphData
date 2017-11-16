@@ -29,20 +29,39 @@ library(ggfortify)
 library(MASS)
 
 ## Import Data
-MorphData<-read.csv("MuhaidatEtAl_MorphData.csv",header=T)
+MorphDataOLD<-read.csv("MuhaidatEtAl_MorphData.csv",header=T) # Original Data sent by Jordan team in summer 2017
+MorphData<-read.csv("MuhaidatEtAl_MorphData2.csv",header=T) # Updated data (fixed student errors) Nov 2017
+#MorphData$FC<-MorphData$SpLen/MorphData$BWdth
 str(MorphData)
 
-## Add midvalue for missing data
-for(Row in 1:nrow(MorphData)){
-  for(Col in 2:ncol(MorphData)){
-    if(is.na(MorphData[Row,Col])){
-      MorphData[Row,Col]<-mean(MorphData[MorphData$Loc==MorphData$Loc[Row],Col],na.rm=T)
-    }
+## Add midvalue for missing data in original dataset
+for(Row in 1:nrow(MorphDataOLD)){
+  for(Col in 2:ncol(MorphDataOLD)){
+    if(is.na(MorphDataOLD[Row,Col])){
+      MorphDataOLD[Row,Col]<-mean(MorphDataOLD[MorphDataOLD$Loc==MorphDataOLD$Loc[Row],Col],na.rm=T)}
   }
 }
 
+
+## Compare old dataset with new
+all.equal(MorphDataOLD,MorphData)
+testdat<-function(datcol){
+  return(cor(MorphDataOLD[,datcol],MorphData[datcol]))
+}
+diag(testdat(names(MorphData)[3:16])) # values <1 indicate changed data
+datcol<-"BVeins"
+
+# Inspect data and prepare for analysis
+
 ## Inspect pairwise scatterplots
 pairs(MorphData[,3:ncol(MorphData)],col=rgb(0,0,0,0.3),pch=16)
+
+## Inspect distributions of continuous variables
+qplot(MorphData$BLen)+theme_simple()
+qplot(MorphData$BWdth)+theme_simple()
+qplot(MorphData$NodeLen)+theme_simple()
+qplot(MorphData$LLen)+theme_simple()
+qplot(MorphData$LWdth)+theme_simple()
 
 ## Scale data to mean and sd prior to analysis
 scale<-function(x){
@@ -50,6 +69,11 @@ scale<-function(x){
 }
 MorphScaled<-data.frame(sapply(MorphData[,3:ncol(MorphData)],scale))
 MorphScaled$Loc<-as.factor(MorphData$Loc)
+# TEST SD 
+cbind(MorphData$BLen,MorphScaled$BLen,(MorphData$BLen-mean(MorphData$BLen,na.rm=T))/sd(MorphData$BLen,na.rm=T))
+qplot(MorphData$BLen,MorphScaled$BLen)
+qplot(MorphScaled$BLen,(MorphData$BLen-mean(MorphData$BLen,na.rm=T))/sd(MorphData$BLen,na.rm=T))
+
 
 # Linear discriminant function analysis
 (BlephLDA<-lda(Loc ~ ., data=MorphScaled))
@@ -73,7 +97,12 @@ p<-ggplot(data=BlephLDAval,aes(x=LD1,y=LD2,group=Loc))+
 print(p)
 
 ## Quickplot to see legend
-qplot(LD1,LD2,data=BlephLDAval)
+ggplot(data=BlephLDAval,aes(x=LD1,y=LD2,group=Loc))+
+  stat_ellipse(geom="polygon",aes(colour=Loc),fill=NA,size=1.2,alpha=0.3)+
+  stat_ellipse(geom="polygon",aes(fill=Loc,colour=Loc),size=1.2,alpha=0.3)+
+  geom_point(aes(shape=Loc,fill=Loc,colour=Loc),size=I(4),alpha=I(0.8))+
+  xlab("LDA1")+ylab("LDA2")
+
 
 pdf("LDAplot.pdf",width=6,height=6)
   print(p)
@@ -111,12 +140,22 @@ anova(lm(BlephLDAval$LD2~MorphScaled$Loc))
 ## Plot trait vectors
 BlephLDAscales$Loc<-NA
 s<-2 # scale for vector
-k<-0.4 # Keep this proportion of largest vectors
+k<-1 # Keep this proportion of largest vectors
 
 keep<-abs(sqrt(BlephLDAscales$LD1^2+BlephLDAscales$LD2^2))>=sort(abs(c(sqrt(BlephLDAscales$LD1^2+BlephLDAscales$LD2^2))),decreasing=T)[floor(nrow(BlephLDAscales)*k)] 
 p+geom_segment(data=BlephLDAscales[keep,],aes(x=0,xend=LD1*s,y=0,yend=LD2*s),
                  arrow = arrow(length = unit(0.5, "cm")),colour="grey",inherit_aes=FALSE)+
     geom_text(data=BlephLDAscales[keep,],aes(x=LD1*s,y=LD2*s,label=desc),size=5)#+coord_fixed() + geom_text(data=BlephLDAval,aes(x=LD1,y=LD2,label=Loc))
+
+
+## Test some diagnostic ratios
+summary(lm(SpLen/BWdth~Loc,data=MorphData))
+summary(lm(log(SpLen/BWdth)~Loc,data=MorphData))
+summary(lm(log(BLen/BWdth)~Loc,data=MorphData))
+
+qplot(Loc,SpLen/BWdth,data=MorphData,geom="boxplot")+theme_simple()
+qplot(Loc,log(SpLen/BWdth),data=MorphData,geom="boxplot")+theme_simple()
+qplot(Loc,log(BLen/BWdth),data=MorphData,geom="boxplot")+theme_simple()
 
 ## Software version info
 sessionInfo()
