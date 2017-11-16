@@ -77,6 +77,8 @@ qplot(MorphScaled$BLen,(MorphData$BLen-mean(MorphData$BLen,na.rm=T))/sd(MorphDat
 
 # Linear discriminant function analysis
 (BlephLDA<-lda(Loc ~ ., data=MorphScaled))
+## Flip LD1 axis
+BlephLDA$scaling[,1]<--BlephLDA$scaling[,1]
 
 ## Extract scaling vectors
 scalvec<-data.frame(BlephLDA$scaling)
@@ -84,8 +86,9 @@ scalvec<-data.frame(BlephLDA$scaling)
 ## Extract predictions
 BlephLDAval <- data.frame(predict(BlephLDA)$x)
 ldahist(data = BlephLDAval[,1], g=MorphScaled$Loc)
-
 BlephLDAval$Loc<-MorphScaled$Loc
+
+
 
 ## Plot results
 p<-ggplot(data=BlephLDAval,aes(x=LD1,y=LD2,group=Loc))+
