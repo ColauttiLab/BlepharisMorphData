@@ -1,15 +1,15 @@
 "","LD1","LD2","desc","F","P"
-"BLen",0.568,-0.198,"Bract Length",20.636,0
-"BWdth",-1.644,-0.487,"Bract Width",121.986,0
-"BVeins",-0.255,0.482,"Veins per bract",14.529,0
-"BSpines",-0.034,-0.309,"Lateral spines",57.277,0
-"SpLen",-0.074,-1.594,"Longest spine length",43.921,0
-"NodeLen",2.309,0.701,"Internode length",169.265,0
-"LLen",-0.105,0.349,"Leaf length",1.89,0.161
-"LWdth",-0.185,-0.458,"Leaf width",0.443,0.644
-"LTeeth",-0.137,-0.343,"Teeth per leaf",0.417,0.661
-"ASFilLen",-0.378,-0.799,"Filament length",3.497,0.037
-"ASAnthLen",-0.085,-0.178,"Anther length",0.057,0.944
-"ASApenLen",0.18,0.597,"Appendage length",1.326,0.274
-"PSFilLen",0.227,0.419,"Filament length",0.147,0.864
-"PSAnthLen",0.01,0.005,"Anther length",0.765,0.47
+"BLen",0.628,-0.45,"Bract Length",20.64,0
+"BWdth",-1.717,1.076,"Bract Width",134.68,0
+"BVeins",-0.352,0.257,"Veins per bract",14.89,0
+"BSpines",-0.017,-1.296,"Lateral spines",57.28,0
+"SpLen",-0.081,-1.335,"Longest spine length",43.92,0
+"NodeLen",2.007,1.249,"Internode length",169.27,0
+"LLen",-0.068,0.211,"Leaf length",1.89,0.161
+"LWdth",-0.14,-0.687,"Leaf width",0.44,0.644
+"LTeeth",-0.12,-0.272,"Teeth per leaf",0.22,0.806
+"ASFilLen",-0.284,-0.873,"Filament length",1.61,0.209
+"ASAnthLen",-0.04,-0.19,"Anther length",0.06,0.944
+"ASApenLen",0.149,0.466,"Appendage length",1.33,0.274
+"PSFilLen",0.282,0.429,"Filament length",0.02,0.983
+"PSAnthLen",-0.058,0.142,"Anther length",0.65,0.528
