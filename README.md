@@ -26,3 +26,8 @@ PSAnthLen -- Length of anther of posterior stamens
 Calculated in original dataset (but removed from .csv):
 FC -- ratio of spine length to bract width
 
+# R Scripts
+
+LDA - Script for Linear Discriminant Analysis of morphological traits
+
+LDAvsISSR -- script for comparing morpological LDA with NMDS of ISSR genotype data
